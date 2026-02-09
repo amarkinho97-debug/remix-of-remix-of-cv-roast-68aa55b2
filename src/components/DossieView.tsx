@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { FileText, AlertCircle, Lightbulb, ArrowRight, Sparkles, Loader2, RefreshCw } from "lucide-react";
+import { FileText, AlertCircle, Lightbulb, Sparkles, Loader2, RefreshCw } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -200,21 +200,28 @@ export const DossieView = ({ cvText, onUpgrade }: DossieViewProps) => {
         className="mt-10"
       >
         <Separator className="mb-10" />
-        <Card className="border-2 border-primary/30 bg-gradient-to-r from-primary/5 to-primary/10 overflow-visible">
-          <CardContent className="p-6 pb-8 text-center overflow-visible">
-            <p className="text-lg font-bold text-foreground mb-2">Com preguiça de arrumar isso tudo sozinho? 😅</p>
-            <p className="text-sm text-muted-foreground mb-4">
-              Deixa que o Primo resolve pra você. CV reescrito e pronto pra copiar.
+        <Card className="border border-primary/30 bg-[radial-gradient(ellipse_at_center,_hsl(25_95%_53%/0.08)_0%,_transparent_70%)] overflow-visible">
+          <CardContent className="p-6 pb-8 text-center overflow-visible space-y-5">
+            <p className="text-muted-foreground text-sm">
+              Com preguiça de arrumar tudo isso sozinho? Deixa que o Primo resolve. 🚀
             </p>
-            <Button
+
+            <button
               onClick={handleUpgrade}
-              size="lg"
-              className="gap-2 glow-orange animate-pulse-glow min-h-[48px] h-auto py-4 whitespace-normal break-words text-center active:scale-95 transition-transform max-w-full"
+              className="group relative w-full max-w-xs mx-auto flex flex-col items-center gap-1 rounded-xl bg-gradient-to-r from-primary to-accent px-6 py-4 shadow-lg shadow-primary/20 animate-pulse-glow active:scale-95 transition-transform"
             >
-              <Sparkles className="w-4 h-4 flex-shrink-0" />
-              <span>Fazer Upgrade para Primo Resolve (+ R$ 10,00)</span>
-              <ArrowRight className="w-4 h-4 flex-shrink-0" />
-            </Button>
+              <span className="flex items-center gap-2 text-primary-foreground font-extrabold text-base">
+                <Sparkles className="w-4 h-4" />
+                Desbloquear Primo Resolve
+              </span>
+              <span className="text-primary-foreground/80 text-xs font-medium">
+                Apenas R$ 10,00
+              </span>
+            </button>
+
+            <p className="text-muted-foreground text-xs">
+              Pagamento único · CV reescrito e pronto pra copiar
+            </p>
           </CardContent>
         </Card>
       </motion.div>
