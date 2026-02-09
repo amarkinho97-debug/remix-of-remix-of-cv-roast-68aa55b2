@@ -92,6 +92,12 @@ O array workHistory DEVE ser ordenado assim:
 ## FORMATO DE RESPOSTA (JSON)
 Você DEVE responder em JSON válido com esta estrutura exata:
 {
+  "contactInfo": {
+    "name": "Nome completo do candidato",
+    "email": "email se encontrado ou null",
+    "phone": "telefone se encontrado ou null",
+    "city": "cidade/estado se encontrado ou null"
+  },
   "summary": "Resumo profissional reescrito (2-3 frases impactantes com métricas se possível)",
   "workHistory": [
     {
@@ -105,29 +111,44 @@ Você DEVE responder em JSON válido com esta estrutura exata:
       ]
     }
   ],
+  "education": [
+    {
+      "institution": "Nome da Instituição",
+      "degree": "Curso ou Grau",
+      "year": "Ano de conclusão (se disponível)"
+    }
+  ],
   "certifications": [
     {
       "name": "Nome do Curso ou Certificação",
       "institution": "Instituição (ex: Nata Cursos, Udemy, Coursera)",
       "year": "Ano de conclusão (se disponível)"
     }
-  ]
+  ],
+  "skills": ["Habilidade 1", "Habilidade 2", "Habilidade 3"]
 }
 
-## CAPTURA DE FORMAÇÃO E CERTIFICAÇÕES
+## CAPTURA DE DADOS DE CONTATO
+- Procure nome, email, telefone, cidade/estado no CV
+- Se não encontrar um dado, retorne null (não invente)
+
+## CAPTURA DE FORMAÇÃO ACADÊMICA (education)
+- Graduação, pós-graduação, MBA, tecnólogo
+- Se não houver formação acadêmica, retorne array vazio []
+
+## CAPTURA DE CERTIFICAÇÕES
 - NÃO FOQUE APENAS EM GRADUAÇÃO! Busque ativamente por:
   - Cursos técnicos (Nata Cursos, CRC, cursos de contabilidade)
   - Plataformas online (Udemy, Coursera, Alura)
   - Certificações profissionais
   - Cursos livres (Lucro Real, Simples Nacional, etc.)
 - Se encontrar "Nata Cursos", "Lucro Real", "Certificação", inclua em certifications
+- Se não houver certificações, retorne array vazio []
 
-## DIRETRIZES DE REESCRITA
-- Transforme descrições vagas em conquistas com números
-- Use verbos de ação fortes (Liderou, Implementou, Otimizou, Reduziu, Aumentou)
-- Adicione métricas estimadas se o original não tiver (ex: "equipe de X pessoas", "redução de Y%")
-- Mantenha fidelidade ao conteúdo original, apenas melhore a apresentação
-- Inclua TODAS as experiências encontradas, não apenas a primeira
+## CAPTURA DE HABILIDADES (skills)
+- Extraia habilidades técnicas e comportamentais mencionadas no CV
+- Se não houver habilidades explícitas, infira 3-5 do contexto das experiências
+- Retorne como array de strings
 
 RESPONDA APENAS COM O JSON, sem explicações ou markdown.`;
  
