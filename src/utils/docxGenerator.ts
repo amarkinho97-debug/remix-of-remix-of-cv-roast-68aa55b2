@@ -4,8 +4,9 @@ import type { RewrittenCV, WorkExperience, Education } from "@/types/cv";
 
 const DARK_BLUE = "1B3A5C";
 const BODY_SIZE = 24; // 12pt
-const HEADING_SIZE = 28; // 14pt
+const HEADING_SIZE = 30; // 15pt
 const NAME_SIZE = 48; // 24pt
+const FONT = "Arial";
 
 function sectionHeading(title: string): Paragraph {
   return new Paragraph({
@@ -15,12 +16,12 @@ function sectionHeading(title: string): Paragraph {
         bold: true,
         size: HEADING_SIZE,
         color: DARK_BLUE,
-        font: "Calibri",
+        font: FONT,
       }),
     ],
-    spacing: { before: 400, after: 100 },
+    spacing: { before: 480, after: 120 },
     border: {
-      bottom: { style: BorderStyle.SINGLE, size: 1, color: DARK_BLUE },
+      bottom: { style: BorderStyle.SINGLE, size: 6, color: DARK_BLUE },
     },
   });
 }
@@ -33,21 +34,25 @@ function bodyText(text: string, options?: { italic?: boolean; bold?: boolean }):
         size: BODY_SIZE,
         italics: options?.italic,
         bold: options?.bold,
-        font: "Calibri",
+        font: FONT,
       }),
     ],
-    spacing: { after: 80 },
+    spacing: { after: 100 },
   });
 }
 
 function bulletPoint(text: string): Paragraph {
   return new Paragraph({
     children: [
-      new TextRun({ text: `•  ${text}`, size: BODY_SIZE, font: "Calibri" }),
+      new TextRun({ text: `•  ${text}`, size: BODY_SIZE, font: FONT }),
     ],
-    spacing: { after: 60 },
+    spacing: { after: 80 },
     indent: { left: 360 },
   });
+}
+
+function emptyLine(): Paragraph {
+  return new Paragraph({ spacing: { after: 120 } });
 }
 
 export async function generateDocx(data: RewrittenCV): Promise<void> {
@@ -62,7 +67,7 @@ export async function generateDocx(data: RewrittenCV): Promise<void> {
           text: name,
           bold: true,
           size: NAME_SIZE,
-          font: "Calibri",
+          font: FONT,
           color: DARK_BLUE,
         }),
       ],
@@ -84,12 +89,12 @@ export async function generateDocx(data: RewrittenCV): Promise<void> {
           new TextRun({
             text: contactParts.join("  |  "),
             size: 22,
-            font: "Calibri",
+            font: FONT,
             color: "555555",
           }),
         ],
         alignment: AlignmentType.CENTER,
-        spacing: { after: 300 },
+        spacing: { after: 360 },
       })
     );
   }
@@ -106,14 +111,14 @@ export async function generateDocx(data: RewrittenCV): Promise<void> {
 
     data.workHistory.forEach((exp: WorkExperience, idx: number) => {
       if (idx > 0) {
-        children.push(new Paragraph({ spacing: { before: 200 } }));
+        children.push(emptyLine());
       }
 
       children.push(
         new Paragraph({
           children: [
-            new TextRun({ text: exp.role, bold: true, size: 26, font: "Calibri" }),
-            new TextRun({ text: `  |  ${exp.company}`, bold: true, size: 26, font: "Calibri", color: DARK_BLUE }),
+            new TextRun({ text: exp.role, bold: true, size: 26, font: FONT }),
+            new TextRun({ text: `  |  ${exp.company}`, bold: true, size: 26, font: FONT, color: DARK_BLUE }),
           ],
           spacing: { after: 40 },
         })
@@ -136,10 +141,10 @@ export async function generateDocx(data: RewrittenCV): Promise<void> {
       children.push(
         new Paragraph({
           children: [
-            new TextRun({ text: edu.institution, bold: true, size: BODY_SIZE, font: "Calibri" }),
-            new TextRun({ text: ` — ${edu.degree}${yearStr}`, size: BODY_SIZE, font: "Calibri" }),
+            new TextRun({ text: edu.institution, bold: true, size: BODY_SIZE, font: FONT }),
+            new TextRun({ text: ` — ${edu.degree}${yearStr}`, size: BODY_SIZE, font: FONT }),
           ],
-          spacing: { after: 80 },
+          spacing: { after: 100 },
         })
       );
     });
@@ -154,10 +159,10 @@ export async function generateDocx(data: RewrittenCV): Promise<void> {
       children.push(
         new Paragraph({
           children: [
-            new TextRun({ text: cert.name, bold: true, size: BODY_SIZE, font: "Calibri" }),
-            new TextRun({ text: ` — ${cert.institution}${yearStr}`, size: BODY_SIZE, font: "Calibri" }),
+            new TextRun({ text: cert.name, bold: true, size: BODY_SIZE, font: FONT }),
+            new TextRun({ text: ` — ${cert.institution}${yearStr}`, size: BODY_SIZE, font: FONT }),
           ],
-          spacing: { after: 80 },
+          spacing: { after: 100 },
         })
       );
     });

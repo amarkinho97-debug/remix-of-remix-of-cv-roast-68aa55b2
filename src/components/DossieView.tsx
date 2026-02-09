@@ -209,11 +209,11 @@ export const DossieView = ({ cvText, onUpgrade }: DossieViewProps) => {
             <Button
               onClick={handleUpgrade}
               size="lg"
-              className="gap-2 glow-orange animate-pulse-glow min-h-[48px] py-4 active:scale-95 transition-transform"
+              className="gap-2 glow-orange animate-pulse-glow min-h-[48px] h-auto py-4 whitespace-normal break-words text-center active:scale-95 transition-transform max-w-full"
             >
-              <Sparkles className="w-4 h-4" />
-              Fazer Upgrade para Primo Resolve (+ R$ 10,00)
-              <ArrowRight className="w-4 h-4" />
+              <Sparkles className="w-4 h-4 flex-shrink-0" />
+              <span>Fazer Upgrade para Primo Resolve (+ R$ 10,00)</span>
+              <ArrowRight className="w-4 h-4 flex-shrink-0" />
             </Button>
           </CardContent>
         </Card>
