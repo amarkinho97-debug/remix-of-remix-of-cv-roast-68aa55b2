@@ -1,13 +1,12 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Shield, Copy, Check, Briefcase, User, Download, Loader2, RefreshCw } from "lucide-react";
+import { Shield, Copy, Check, Briefcase, User, Download, Loader2, RefreshCw, GraduationCap, Wrench } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
-import { Document, Packer, Paragraph, TextRun, HeadingLevel } from "docx";
-import { saveAs } from "file-saver";
 import { supabase } from "@/integrations/supabase/client";
+import { generateDocx } from "@/utils/docxGenerator";
 import type { RewrittenCV, WorkExperience } from "@/types/cv";
 
 interface BlindedCVProps {
@@ -87,105 +86,11 @@ export const BlindedCV = ({ cvText }: BlindedCVProps) => {
     setIsDownloading(true);
     
     try {
-      // Build experience paragraphs from ALL work history
-      const experienceParagraphs: Paragraph[] = [];
-      
-      rewrittenData.workHistory.forEach((exp: WorkExperience, index: number) => {
-        // Add spacing before each experience (except first)
-        if (index > 0) {
-          experienceParagraphs.push(new Paragraph({ spacing: { before: 300 } }));
-        }
-        
-        // Company and Role
-        experienceParagraphs.push(
-          new Paragraph({
-            children: [
-              new TextRun({
-                text: `${exp.role} | ${exp.company}`,
-                bold: true,
-                size: 26,
-              }),
-            ],
-            spacing: { after: 80 },
-          })
-        );
-        
-        // Period
-        experienceParagraphs.push(
-          new Paragraph({
-            children: [
-              new TextRun({
-                text: exp.period,
-                italics: true,
-                size: 22,
-              }),
-            ],
-            spacing: { after: 120 },
-          })
-        );
-        
-        // Bullets
-        exp.bullets.forEach((bullet: string) => {
-          experienceParagraphs.push(
-            new Paragraph({
-              children: [
-                new TextRun({
-                  text: `• ${bullet}`,
-                  size: 24,
-                }),
-              ],
-              spacing: { after: 80 },
-            })
-          );
-        });
-      });
-
-      const doc = new Document({
-        sections: [{
-          properties: {},
-          children: [
-            // Title
-            new Paragraph({
-              text: "CURRÍCULO PROFISSIONAL",
-              heading: HeadingLevel.TITLE,
-              spacing: { after: 400 },
-            }),
-            
-            // Summary Section
-            new Paragraph({
-              text: "RESUMO PROFISSIONAL",
-              heading: HeadingLevel.HEADING_1,
-              spacing: { before: 400, after: 200 },
-            }),
-            new Paragraph({
-              children: [
-                new TextRun({
-                  text: rewrittenData.summary,
-                  size: 24,
-                }),
-              ],
-              spacing: { after: 300 },
-            }),
-            
-            // Experience Section Header
-            new Paragraph({
-              text: "EXPERIÊNCIA PROFISSIONAL",
-              heading: HeadingLevel.HEADING_1,
-              spacing: { before: 400, after: 200 },
-            }),
-            
-            // All experiences
-            ...experienceParagraphs,
-          ],
-        }],
-      });
-
-      const blob = await Packer.toBlob(doc);
-      saveAs(blob, "CV_Blindado_CVSincero.docx");
+      await generateDocx(rewrittenData);
       
       toast({
         title: "Download iniciado! 📥",
-        description: `Seu CV com ${rewrittenData.workHistory.length} experiências está sendo baixado.`,
+        description: `Seu CV completo com ${rewrittenData.workHistory.length} experiências está sendo baixado.`,
       });
     } catch (err) {
       console.error("Error generating DOCX:", err);
@@ -269,14 +174,22 @@ export const BlindedCV = ({ cvText }: BlindedCVProps) => {
       <Card className="border-2 border-primary/20 bg-gradient-to-b from-primary/5 to-transparent">
         <CardHeader className="pb-2">
           <Tabs defaultValue="summary" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="summary" className="gap-2">
+            <TabsList className="grid w-full grid-cols-2 md:grid-cols-4">
+              <TabsTrigger value="summary" className="gap-1 text-xs md:text-sm">
                 <User className="w-4 h-4" />
-                Novo Resumo
+                Resumo
               </TabsTrigger>
-              <TabsTrigger value="experience" className="gap-2">
+              <TabsTrigger value="experience" className="gap-1 text-xs md:text-sm">
                 <Briefcase className="w-4 h-4" />
                 Experiências ({rewrittenData.workHistory.length})
+              </TabsTrigger>
+              <TabsTrigger value="education" className="gap-1 text-xs md:text-sm">
+                <GraduationCap className="w-4 h-4" />
+                Formação
+              </TabsTrigger>
+              <TabsTrigger value="skills" className="gap-1 text-xs md:text-sm">
+                <Wrench className="w-4 h-4" />
+                Habilidades
               </TabsTrigger>
             </TabsList>
 
@@ -308,6 +221,56 @@ export const BlindedCV = ({ cvText }: BlindedCVProps) => {
                     </ul>
                   </div>
                 ))}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="education" className="mt-4">
+              <div className="bg-card border border-border rounded-lg p-6 space-y-4">
+                {rewrittenData.education && rewrittenData.education.length > 0 ? (
+                  rewrittenData.education.map((edu, index) => (
+                    <div key={index} className={index > 0 ? "pt-4 border-t border-border" : ""}>
+                      <h4 className="font-bold text-base text-foreground">{edu.institution}</h4>
+                      <p className="text-sm text-muted-foreground">
+                        {edu.degree}{edu.year ? ` (${edu.year})` : ""}
+                      </p>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-sm text-muted-foreground italic">Nenhuma formação acadêmica encontrada no CV.</p>
+                )}
+
+                {rewrittenData.certifications && rewrittenData.certifications.length > 0 && (
+                  <>
+                    <h4 className="font-bold text-sm text-primary mt-4 pt-4 border-t border-border">Certificações</h4>
+                    {rewrittenData.certifications.map((cert, index) => (
+                      <div key={index}>
+                        <p className="text-sm text-foreground font-medium">{cert.name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {cert.institution}{cert.year ? ` (${cert.year})` : ""}
+                        </p>
+                      </div>
+                    ))}
+                  </>
+                )}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="skills" className="mt-4">
+              <div className="bg-card border border-border rounded-lg p-6">
+                {rewrittenData.skills && rewrittenData.skills.length > 0 ? (
+                  <div className="flex flex-wrap gap-2">
+                    {rewrittenData.skills.map((skill, index) => (
+                      <span
+                        key={index}
+                        className="inline-block bg-primary/10 text-primary text-sm font-medium px-3 py-1 rounded-full"
+                      >
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground italic">Nenhuma habilidade encontrada no CV.</p>
+                )}
               </div>
             </TabsContent>
           </Tabs>
